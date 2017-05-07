@@ -20,7 +20,6 @@ class Board:
     extra_time =  timedelta()
 
     last_animated = datetime.now()
-    hop = 0
     def __init__(self):
         width = 2
         for x in range(0,2):
@@ -46,6 +45,7 @@ class Board:
     def get_handle(self,x,y,z):
         return self.handles[x*6 + y*2 + z]
 
+
     def send(self):
         for arduino in self.arduinos:
             arduino.send("moveClock1",
@@ -63,7 +63,13 @@ class Board:
                          self.get_handle(1 ,2 ,0).target_angle,
                          self.get_handle(1 ,2 ,1).target_angle)
     def set_digital_time(self):
-        pass
+        zero = [1,2,0,2,0,1,3,2,0,2,0,3]
+        one = [3,3,3,3,3,3,2,2,0,2,0,0]
+        two = [1,1,1,2,0,1,3,2,0,3,3,3]
+
+        number = zero
+        for x in range(0,12):
+            self.handles[x].target_angle = zero[x]*90
     def set_analog_time(self):
         time = (datetime.now() + self.extra_time).time()
         hour_angle = math.floor(360.0 * (time.hour%12) / 12.0)
@@ -81,7 +87,7 @@ class Board:
         elapsed = now - self.last_animated
         if elapsed.microseconds > 500 :
             self.last_animated = now
-            self.set_analog_time()
+            self.set_digital_time()
             self.send()
         t=Timer(0.5,self.run)
         t.start()
