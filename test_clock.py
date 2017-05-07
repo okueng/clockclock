@@ -1,9 +1,8 @@
 from unittest import TestCase
-from main import Clock
+from Clock import Clock
 
 class TestClock(TestCase):
     def setUp(self):
-        self.clock = Clock()
-
+        pass
     def test_first_add_degrees(self):
         self.fail()

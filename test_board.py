@@ -1,5 +1,5 @@
 from unittest import TestCase
-from main import Board
+from Clock import Board
 
 class TestBoard(TestCase):
 
