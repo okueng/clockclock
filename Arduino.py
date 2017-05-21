@@ -7,12 +7,14 @@ from datetime import datetime
 
 class Arduino:
     engines = []
-    def __init__(self):
+    def __init__(self,index):
+        self.width = 2
+        self.global_index = index
         self.last_animated = datetime.now()
-        for x in range(0,2):
+        for x in range(0,self.width):
             for y in range(0,3):
                 for z in range(0,2):
-                    engine = Engine((x,y),z)
+                    engine = Engine(((self.width*self.global_index)+ x,y),z)
                     self.engines.append(engine)
 
     def setCanvas(self,w:Canvas):
@@ -21,23 +23,24 @@ class Arduino:
     def angle2localCanvas(self, angle, clock_size):
         return (cos(angle-pi/2) * clock_size / 2, sin(angle-pi/2) * clock_size / 2)
     def get_engine(self, x, y, z):
-        return self.engines[x*6+y*2+z]
+        xx = x+(self.width*self.global_index)
+        return self.engines[xx*6+y*2+z]
 
     def send(self,name,cmd0,cmd1,cmd2,cmd3,cmd4,cmd5):
             if name == "moveClock1":
-                self.get_engine(0, 0, 0).moveToDegrees(cmd0)
-                self.get_engine(0, 0, 1).moveToDegrees(cmd1)
-                self.get_engine(0, 1, 0).moveToDegrees(cmd2)
-                self.get_engine(0, 1, 1).moveToDegrees(cmd3)
-                self.get_engine(0, 2, 0).moveToDegrees(cmd4)
-                self.get_engine(0, 2, 1).moveToDegrees(cmd5)
+                self.get_engine(0, 0, 0).moveToDegrees(cmd0/4)
+                self.get_engine(0, 0, 1).moveToDegrees(cmd1/4)
+                self.get_engine(0, 1, 0).moveToDegrees(cmd2/4)
+                self.get_engine(0, 1, 1).moveToDegrees(cmd3/4)
+                self.get_engine(0, 2, 0).moveToDegrees(cmd4/4)
+                self.get_engine(0, 2, 1).moveToDegrees(cmd5/4)
             elif name == "moveClock2":
-                self.get_engine(1, 0, 0).moveToDegrees(cmd0)
-                self.get_engine(1, 0, 1).moveToDegrees(cmd1)
-                self.get_engine(1, 1, 0).moveToDegrees(cmd2)
-                self.get_engine(1, 1, 1).moveToDegrees(cmd3)
-                self.get_engine(1, 2, 0).moveToDegrees(cmd4)
-                self.get_engine(1, 2, 1).moveToDegrees(cmd5)
+                self.get_engine(1, 0, 0).moveToDegrees(cmd0/4)
+                self.get_engine(1, 0, 1).moveToDegrees(cmd1/4)
+                self.get_engine(1, 1, 0).moveToDegrees(cmd2/4)
+                self.get_engine(1, 1, 1).moveToDegrees(cmd3/4)
+                self.get_engine(1, 2, 0).moveToDegrees(cmd4/4)
+                self.get_engine(1, 2, 1).moveToDegrees(cmd5/4)
 
     def draw(self):
         clock_size=200
@@ -68,7 +71,7 @@ class Arduino:
         for engine in self.engines:
             engine.run(elapsed)
         self.draw()
-        self.canvas.after(30, self.animate)
+        self.canvas.after(100, self.animate)
 
 class Engine:
     global_position = (0,0)
@@ -88,4 +91,4 @@ class Engine:
         if abs(self.current_position-self.target_position) < 30 :
             self.current_position = self.target_position
         else:
-            self.current_position = (self.current_position+15)%self.max_position
+            self.current_position = (self.current_position+30)%self.max_position
