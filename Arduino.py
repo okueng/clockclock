@@ -17,8 +17,33 @@ class Arduino:
                     engine = Engine(((self.width*self.global_index)+ x,y),z)
                     self.engines.append(engine)
 
-    def setCanvas(self,w:Canvas):
+    def setCanvas(self,master:Tk , w:Canvas):
         self.canvas = w
+
+        clock_size = 200
+
+        for engine in self.engines:
+            top_left_x = engine.global_position[0] * clock_size
+            top_left_y = engine.global_position[1] * clock_size
+            center_x = top_left_x + clock_size / 2
+            center_y = top_left_y + clock_size / 2
+
+
+            handle_color = "red"
+            handle_size= clock_size - 40
+            if engine.handle_type == 0:
+                self.canvas.create_oval(top_left_x, top_left_y, top_left_x + clock_size, top_left_y + clock_size,
+                                        fill="white")
+                handle_color = "blue"
+                handle_size = clock_size
+
+
+            pos = self.angle2localCanvas(engine.current_angle(), handle_size)
+            engine.line =  self.canvas.create_line(center_x, center_y,
+                                    center_x + pos[0],
+                                    center_y + pos[1],
+                                    width=8, fill=handle_color)
+
 
     def angle2localCanvas(self, angle, clock_size):
         return (cos(angle-pi/2) * clock_size / 2, sin(angle-pi/2) * clock_size / 2)
@@ -50,19 +75,14 @@ class Arduino:
             center_x = top_left_x + clock_size / 2
             center_y = top_left_y + clock_size / 2
 
-            handle_color = "red"
-            handle_size= clock_size - 20
-
+            handle_size= clock_size - 40
             if engine.handle_type == 0:
-                self.canvas.create_oval(top_left_x, top_left_y, top_left_x + clock_size, top_left_y + clock_size, fill="white")
                 handle_size = clock_size
-                handle_color = "blue"
 
             pos = self.angle2localCanvas(engine.current_angle(), handle_size)
-            self.canvas.create_line(center_x, center_y,
+            self.canvas.coords(engine.line,center_x, center_y,
                           center_x + pos[0],
-                          center_y + pos[1],
-                          width=8, fill=handle_color)
+                          center_y + pos[1])
     def animate(self):
         now = datetime.now()
         # print(str((now - self.last_time).seconds))
@@ -71,7 +91,7 @@ class Arduino:
         for engine in self.engines:
             engine.run(elapsed)
         self.draw()
-        self.canvas.after(100, self.animate)
+        self.canvas.after(50, self.animate)
 
 class Engine:
     global_position = (0,0)
@@ -91,4 +111,4 @@ class Engine:
         if abs(self.current_position-self.target_position) < 30 :
             self.current_position = self.target_position
         else:
-            self.current_position = (self.current_position+30)%self.max_position
+            self.current_position = (self.current_position-30)%self.max_position

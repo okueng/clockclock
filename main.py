@@ -7,7 +7,7 @@ import PyCmdMessenger
 import platform
 
 clock_size = 100
-width = 2
+width = 4
 height = 3
 
 due = [None] * (int(width / 2))
